@@ -11,7 +11,39 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "bahodir-lottery/overview",
+              "bahodir-lottery/architecture"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "bahodir-lottery/user-features",
+              "bahodir-lottery/admin-features",
+              "bahodir-lottery/payment-system"
+            ]
+          },
+          {
+            "group": "Security",
+            "pages": [
+              "bahodir-lottery/security"
+            ]
+          },
+          {
+            "group": "API reference",
+            "pages": [
+              "bahodir-lottery/api-reference"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Mintlify Guides",
         "groups": [
           {
             "group": "Getting started",
@@ -48,7 +80,7 @@
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "Mintlify API",
         "groups": [
           {
             "group": "API documentation",
