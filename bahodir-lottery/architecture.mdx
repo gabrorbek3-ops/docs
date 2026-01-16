@@ -1,0 +1,706 @@
+---
+title: "Technical architecture"
+description: "Microservices architecture, technology stack, and system design for the Bahodir Brat Lottery Bot"
+---
+
+## System architecture
+
+The Bahodir Brat Lottery Bot uses a microservices architecture to ensure scalability, maintainability, and fault tolerance.
+
+### High-level architecture
+
+```mermaid
+graph TB
+    subgraph "Client Layer"
+        A[Telegram Bot Interface]
+        B[Telegram Web App]
+        C[Admin Web Panel]
+    end
+    
+    subgraph "API Gateway Layer"
+        D[Nginx Reverse Proxy]
+        E[Rate Limiter]
+        F[Load Balancer]
+    end
+    
+    subgraph "Application Layer"
+        G[Auth Service]
+        H[User Service]
+        I[Payment Service]
+        J[Lottery Service]
+        K[Notification Service]
+        L[Analytics Service]
+    end
+    
+    subgraph "Data Layer"
+        M[(PostgreSQL)]
+        N[(Redis Cache)]
+        O[(File Storage)]
+    end
+    
+    subgraph "External Services"
+        P[Telegram API]
+        Q[YouTube API]
+        R[Payment Banks]
+    end
+    
+    A --> D
+    B --> D
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+    F --> H
+    F --> I
+    F --> J
+    F --> K
+    F --> L
+    
+    G --> M
+    H --> M
+    I --> M
+    J --> M
+    L --> M
+    
+    I --> N
+    J --> N
+    H --> N
+    
+    I --> O
+    
+    K --> P
+    J --> Q
+    I --> R
+```
+
+## Technology stack
+
+### Backend services
+
+<Tabs>
+<Tab title="Core framework">
+  **FastAPI** - Modern Python web framework
+  
+  ```python
+  from fastapi import FastAPI, Depends
+  from fastapi.middleware.cors import CORSMiddleware
+  
+  app = FastAPI(
+      title="Bahodir Lottery API",
+      version="1.0.0",
+      docs_url="/api/docs"
+  )
+  
+  app.add_middleware(
+      CORSMiddleware,
+      allow_origins=["*"],
+      allow_credentials=True,
+      allow_methods=["*"],
+      allow_headers=["*"],
+  )
+  ```
+  
+  **Key features:**
+  - Automatic API documentation (Swagger/OpenAPI)
+  - Built-in data validation with Pydantic
+  - Async/await support for high performance
+  - Dependency injection system
+</Tab>
+
+<Tab title="Database">
+  **PostgreSQL 15+** - Primary database
+  
+  ```python
+  from sqlalchemy import create_engine
+  from sqlalchemy.ext.declarative import declarative_base
+  from sqlalchemy.orm import sessionmaker
+  
+  DATABASE_URL = "postgresql://user:password@localhost:5432/lottery_db"
+  
+  engine = create_engine(
+      DATABASE_URL,
+      pool_size=20,
+      max_overflow=40,
+      pool_pre_ping=True
+  )
+  
+  SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+  Base = declarative_base()
+  ```
+  
+  **Schema design:**
+  - Users and authentication
+  - Tickets and orders
+  - Payments and transactions
+  - Lottery draws and winners
+  - Audit logs
+</Tab>
+
+<Tab title="Caching">
+  **Redis 7+** - In-memory cache and session store
+  
+  ```python
+  import redis
+  from redis import ConnectionPool
+  
+  pool = ConnectionPool(
+      host='localhost',
+      port=6379,
+      db=0,
+      max_connections=50,
+      decode_responses=True
+  )
+  
+  redis_client = redis.Redis(connection_pool=pool)
+  
+  # Cache user session
+  def cache_user_session(user_id: int, session_data: dict):
+      redis_client.setex(
+          f"session:{user_id}",
+          3600,  # 1 hour TTL
+          json.dumps(session_data)
+      )
+  ```
+  
+  **Use cases:**
+  - User session management
+  - API rate limiting
+  - Lottery draw caching
+  - Real-time statistics
+</Tab>
+
+<Tab title="Task queue">
+  **Celery** - Distributed task queue
+  
+  ```python
+  from celery import Celery
+  
+  celery_app = Celery(
+      'lottery_tasks',
+      broker='redis://localhost:6379/1',
+      backend='redis://localhost:6379/2'
+  )
+  
+  @celery_app.task
+  def send_payment_notification(user_id: int, order_id: int):
+      """Send payment confirmation notification"""
+      user = get_user(user_id)
+      order = get_order(order_id)
+      send_telegram_message(user.telegram_id, f"Payment confirmed for order #{order_id}")
+  
+  @celery_app.task
+  def process_lottery_draw(lottery_id: int):
+      """Process lottery draw and select winners"""
+      lottery = get_lottery(lottery_id)
+      winners = select_random_winners(lottery)
+      notify_winners(winners)
+  ```
+  
+  **Background tasks:**
+  - Payment processing
+  - Notification delivery
+  - Lottery draw execution
+  - Analytics calculation
+</Tab>
+</Tabs>
+
+### Frontend technologies
+
+<CardGroup cols={2}>
+<Card title="Telegram Web App" icon="mobile">
+  **Technology:**
+  - Telegram Web App API
+  - Vanilla JavaScript (ES6+)
+  - CSS3 with Telegram UI Kit
+  - LocalStorage for offline support
+  
+  **Features:**
+  - Native Telegram integration
+  - Responsive design
+  - Real-time updates
+  - Offline ticket viewing
+</Card>
+
+<Card title="Admin panel" icon="desktop">
+  **Technology:**
+  - HTML5 + CSS3
+  - JavaScript (ES6+)
+  - Chart.js for analytics
+  - DataTables for data management
+  
+  **Features:**
+  - Real-time dashboard
+  - Payment verification UI
+  - User management
+  - Analytics and reporting
+</Card>
+</CardGroup>
+
+## Service architecture
+
+### 1. Authentication service
+
+Handles user authentication and authorization.
+
+```python
+from fastapi import APIRouter, Depends, HTTPException
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+
+router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+@router.post("/telegram-login")
+async def telegram_login(telegram_data: TelegramAuthData):
+    """Authenticate user via Telegram"""
+    # Verify Telegram data hash
+    if not verify_telegram_auth(telegram_data):
+        raise HTTPException(status_code=401, detail="Invalid Telegram data")
+    
+    # Get or create user
+    user = await get_or_create_user(telegram_data)
+    
+    # Generate JWT token
+    access_token = create_access_token(data={"sub": str(user.id)})
+    
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": user
+    }
+```
+
+**Responsibilities:**
+- Telegram authentication verification
+- JWT token generation and validation
+- Role-based access control
+- Session management
+
+### 2. Payment service
+
+Manages payment processing and verification.
+
+```python
+from fastapi import APIRouter, UploadFile, File
+from typing import List
+
+router = APIRouter(prefix="/payments", tags=["Payments"])
+
+@router.post("/orders/{order_id}/upload-receipt")
+async def upload_payment_receipt(
+    order_id: int,
+    receipt: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
+):
+    """Upload payment receipt for verification"""
+    # Validate file
+    if receipt.content_type not in ["image/jpeg", "image/png"]:
+        raise HTTPException(status_code=400, detail="Invalid file type")
+    
+    if receipt.size > 5 * 1024 * 1024:  # 5MB
+        raise HTTPException(status_code=400, detail="File too large")
+    
+    # Save receipt
+    file_path = await save_receipt(order_id, receipt)
+    
+    # Update order status
+    order = await update_order_status(order_id, "pending_verification")
+    
+    # Notify admin
+    await notify_admin_new_receipt(order_id)
+    
+    return {"message": "Receipt uploaded successfully", "order": order}
+
+@router.post("/orders/{order_id}/verify")
+async def verify_payment(
+    order_id: int,
+    verification: PaymentVerification,
+    current_user: User = Depends(get_current_admin)
+):
+    """Admin: Verify payment receipt"""
+    order = await get_order(order_id)
+    
+    if verification.approved:
+        # Approve payment
+        await approve_payment(order_id)
+        await activate_tickets(order_id)
+        await notify_user_payment_approved(order.user_id)
+    else:
+        # Reject payment
+        await reject_payment(order_id, verification.reason)
+        await notify_user_payment_rejected(order.user_id, verification.reason)
+    
+    return {"message": "Payment verification completed"}
+```
+
+**Responsibilities:**
+- Receipt upload and storage
+- Payment verification workflow
+- Order status management
+- Payment notifications
+
+### 3. Lottery service
+
+Manages lottery draws and winner selection.
+
+```python
+from fastapi import APIRouter
+import random
+from typing import List
+
+router = APIRouter(prefix="/lottery", tags=["Lottery"])
+
+@router.post("/draws/{draw_id}/start")
+async def start_lottery_draw(
+    draw_id: int,
+    current_user: User = Depends(get_current_admin)
+):
+    """Start a lottery draw"""
+    draw = await get_lottery_draw(draw_id)
+    
+    # Validate draw can start
+    if draw.status != "scheduled":
+        raise HTTPException(status_code=400, detail="Draw already started")
+    
+    # Update status
+    await update_draw_status(draw_id, "active")
+    
+    # Notify users
+    await broadcast_lottery_started(draw_id)
+    
+    return {"message": "Lottery draw started", "draw": draw}
+
+@router.post("/draws/{draw_id}/select-winners")
+async def select_winners(
+    draw_id: int,
+    current_user: User = Depends(get_current_admin)
+):
+    """Select lottery winners"""
+    draw = await get_lottery_draw(draw_id)
+    
+    # Get all valid tickets
+    tickets = await get_valid_tickets(draw_id)
+    
+    if len(tickets) == 0:
+        raise HTTPException(status_code=400, detail="No valid tickets")
+    
+    # Select winners based on ticket tiers
+    winners = []
+    
+    # VIP tickets have 3x chance
+    # Gold tickets have 2x chance
+    # Standard tickets have 1x chance
+    weighted_tickets = []
+    for ticket in tickets:
+        weight = {"vip": 3, "gold": 2, "standard": 1}[ticket.tier]
+        weighted_tickets.extend([ticket] * weight)
+    
+    # Select random winners
+    num_winners = draw.prize_count
+    selected = random.sample(weighted_tickets, min(num_winners, len(weighted_tickets)))
+    
+    # Save winners
+    for ticket in selected:
+        winner = await create_winner(draw_id, ticket.id, ticket.user_id)
+        winners.append(winner)
+    
+    # Update draw status
+    await update_draw_status(draw_id, "completed")
+    
+    # Notify winners
+    await notify_winners(winners)
+    
+    return {"message": "Winners selected", "winners": winners}
+```
+
+**Responsibilities:**
+- Lottery draw management
+- Weighted random winner selection
+- Ticket validation
+- Winner notifications
+
+### 4. Notification service
+
+Handles all user notifications via Telegram.
+
+```python
+from telegram import Bot
+from fastapi import APIRouter
+
+router = APIRouter(prefix="/notifications", tags=["Notifications"])
+
+bot = Bot(token=TELEGRAM_BOT_TOKEN)
+
+async def send_telegram_notification(
+    user_id: int,
+    message: str,
+    parse_mode: str = "HTML"
+):
+    """Send Telegram notification to user"""
+    user = await get_user(user_id)
+    
+    try:
+        await bot.send_message(
+            chat_id=user.telegram_id,
+            text=message,
+            parse_mode=parse_mode
+        )
+        
+        # Log notification
+        await log_notification(user_id, "telegram", message, "sent")
+        
+    except Exception as e:
+        # Log error
+        await log_notification(user_id, "telegram", message, "failed", str(e))
+
+# Notification templates
+NOTIFICATION_TEMPLATES = {
+    "payment_approved": """
+✅ <b>To'lov tasdiqlandi!</b>
+
+Buyurtma: #{order_id}
+Summa: {amount} RUB
+Biletlar: {ticket_count} ta
+
+Biletlaringiz faollashtirildi. Omad!
+    """,
+    
+    "payment_rejected": """
+❌ <b>To'lov rad etildi</b>
+
+Buyurtma: #{order_id}
+Sabab: {reason}
+
+Iltimos, to'g'ri chek yuklang.
+    """,
+    
+    "lottery_winner": """
+🎉 <b>TABRIKLAYMIZ!</b>
+
+Siz {lottery_name} lotereyasida g'olib bo'ldingiz!
+
+Sovg'a: {prize_name}
+Bilet: #{ticket_number}
+
+Admin tez orada siz bilan bog'lanadi.
+    """
+}
+```
+
+**Responsibilities:**
+- Telegram message delivery
+- Notification templating
+- Delivery tracking
+- Error handling
+
+## Database schema
+
+### Core tables
+
+<Tabs>
+<Tab title="Users">
+  ```sql
+  CREATE TABLE users (
+      id SERIAL PRIMARY KEY,
+      telegram_id BIGINT UNIQUE NOT NULL,
+      username VARCHAR(255),
+      first_name VARCHAR(255),
+      last_name VARCHAR(255),
+      phone_number VARCHAR(20),
+      role VARCHAR(50) DEFAULT 'user',
+      balance DECIMAL(10, 2) DEFAULT 0.00,
+      is_active BOOLEAN DEFAULT TRUE,
+      is_premium BOOLEAN DEFAULT FALSE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+  
+  CREATE INDEX idx_users_telegram_id ON users(telegram_id);
+  CREATE INDEX idx_users_role ON users(role);
+  ```
+</Tab>
+
+<Tab title="Orders">
+  ```sql
+  CREATE TABLE orders (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id),
+      lottery_draw_id INTEGER REFERENCES lottery_draws(id),
+      ticket_tier VARCHAR(20) NOT NULL,
+      ticket_count INTEGER NOT NULL,
+      total_amount DECIMAL(10, 2) NOT NULL,
+      status VARCHAR(50) DEFAULT 'pending',
+      payment_method VARCHAR(50),
+      receipt_url VARCHAR(500),
+      verified_by INTEGER REFERENCES users(id),
+      verified_at TIMESTAMP,
+      rejection_reason TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+  
+  CREATE INDEX idx_orders_user_id ON orders(user_id);
+  CREATE INDEX idx_orders_status ON orders(status);
+  CREATE INDEX idx_orders_created_at ON orders(created_at);
+  ```
+</Tab>
+
+<Tab title="Tickets">
+  ```sql
+  CREATE TABLE tickets (
+      id SERIAL PRIMARY KEY,
+      order_id INTEGER REFERENCES orders(id),
+      user_id INTEGER REFERENCES users(id),
+      lottery_draw_id INTEGER REFERENCES lottery_draws(id),
+      ticket_number VARCHAR(50) UNIQUE NOT NULL,
+      tier VARCHAR(20) NOT NULL,
+      is_active BOOLEAN DEFAULT FALSE,
+      is_winner BOOLEAN DEFAULT FALSE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+  
+  CREATE INDEX idx_tickets_user_id ON tickets(user_id);
+  CREATE INDEX idx_tickets_lottery_draw_id ON tickets(lottery_draw_id);
+  CREATE INDEX idx_tickets_ticket_number ON tickets(ticket_number);
+  ```
+</Tab>
+
+<Tab title="Lottery draws">
+  ```sql
+  CREATE TABLE lottery_draws (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      description TEXT,
+      youtube_stream_url VARCHAR(500),
+      start_time TIMESTAMP,
+      end_time TIMESTAMP,
+      status VARCHAR(50) DEFAULT 'scheduled',
+      prize_count INTEGER DEFAULT 1,
+      ticket_price_standard DECIMAL(10, 2),
+      ticket_price_gold DECIMAL(10, 2),
+      ticket_price_vip DECIMAL(10, 2),
+      created_by INTEGER REFERENCES users(id),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+  
+  CREATE INDEX idx_lottery_draws_status ON lottery_draws(status);
+  CREATE INDEX idx_lottery_draws_start_time ON lottery_draws(start_time);
+  ```
+</Tab>
+</Tabs>
+
+## Deployment architecture
+
+### Docker compose setup
+
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: lottery_db
+      POSTGRES_USER: lottery_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lottery_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build: ./backend
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+      - ./uploads:/app/uploads
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://lottery_user:${DB_PASSWORD}@postgres:5432/lottery_db
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery_worker:
+    build: ./backend
+    command: celery -A tasks worker --loglevel=info
+    volumes:
+      - ./backend:/app
+    environment:
+      DATABASE_URL: postgresql://lottery_user:${DB_PASSWORD}@postgres:5432/lottery_db
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./frontend:/usr/share/nginx/html
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+  redis_data:
+```
+
+## Performance optimization
+
+<AccordionGroup>
+<Accordion title="Database optimization">
+  - Connection pooling (20-40 connections)
+  - Indexed queries on frequently accessed columns
+  - Materialized views for analytics
+  - Query result caching in Redis
+  - Partitioning for large tables (tickets, orders)
+</Accordion>
+
+<Accordion title="API optimization">
+  - Response caching with Redis
+  - Database query optimization
+  - Async/await for I/O operations
+  - Connection pooling
+  - Rate limiting per user
+</Accordion>
+
+<Accordion title="Caching strategy">
+  - User sessions: 1 hour TTL
+  - Lottery data: 5 minutes TTL
+  - Statistics: 1 minute TTL
+  - Static content: 24 hours TTL
+</Accordion>
+</AccordionGroup>
+
+<Note>
+For production deployment, consider using managed services for PostgreSQL and Redis, and implement proper monitoring with Prometheus and Grafana.
+</Note>
