@@ -1,0 +1,961 @@
+---
+title: "Admin features"
+description: "Complete admin dashboard guide - payment verification, lottery management, user administration, and analytics"
+---
+
+## Admin dashboard overview
+
+The admin panel provides comprehensive control over the lottery system with real-time monitoring and management capabilities.
+
+<CardGroup cols={2}>
+<Card title="Dashboard" icon="chart-line">
+  Real-time statistics and revenue tracking
+</Card>
+
+<Card title="Payment verification" icon="check-circle">
+  Review and approve payment receipts
+</Card>
+
+<Card title="Lottery management" icon="trophy">
+  Create, start, and manage lottery draws
+</Card>
+
+<Card title="User management" icon="users">
+  View and manage user accounts
+</Card>
+</CardGroup>
+
+## Accessing admin panel
+
+<Steps>
+<Step title="Login">
+  Navigate to the admin panel URL:
+  
+  ```
+  https://lottery.bahodirbrat.com/admin
+  ```
+  
+  Enter admin credentials:
+  - Username: Your admin username
+  - Password: Your secure password
+  
+  <Warning>
+  Never share admin credentials. Use strong passwords and enable 2FA.
+  </Warning>
+</Step>
+
+<Step title="Two-factor authentication">
+  Enter the 6-digit code from your authenticator app:
+  
+  ```
+  🔐 2FA Verification
+  
+  Enter code from Google Authenticator:
+  [______]
+  ```
+  
+  <Check>
+  Successfully logged in. Redirecting to dashboard...
+  </Check>
+</Step>
+</Steps>
+
+## Dashboard
+
+### Real-time statistics
+
+The main dashboard displays key metrics updated in real-time:
+
+```
+📊 DASHBOARD - BAHODIR BRAT LOTTERY
+
+Today's Statistics (2024-01-20)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💰 Revenue
+Today: 245,000 RUB (+15% vs yesterday)
+This Week: 1,450,000 RUB
+This Month: 5,230,000 RUB
+All Time: 45,670,000 RUB
+
+👥 Users
+Total Users: 12,547
+New Today: 234
+Active Today: 3,456
+Premium Members: 1,234
+
+🎫 Tickets
+Sold Today: 1,234
+Pending Orders: 45
+Active Tickets: 8,901
+
+⏳ Pending Actions
+Payment Verifications: 12
+Support Tickets: 5
+```
+
+<Tabs>
+<Tab title="Revenue chart">
+  Interactive revenue chart showing:
+  - Daily revenue trends
+  - Comparison with previous periods
+  - Revenue by ticket tier
+  - Payment method breakdown
+</Tab>
+
+<Tab title="User growth">
+  User acquisition metrics:
+  - New registrations over time
+  - User retention rate
+  - Active user percentage
+  - Premium conversion rate
+</Tab>
+
+<Tab title="Ticket sales">
+  Ticket sales analytics:
+  - Sales by ticket tier
+  - Popular lottery draws
+  - Peak purchase times
+  - Conversion funnel
+</Tab>
+</Tabs>
+
+## Payment verification
+
+### Pending payments queue
+
+View all payments awaiting verification:
+
+```
+💳 PENDING PAYMENT VERIFICATIONS (12)
+
+Sort by: [Oldest First ▼] Filter: [All Tiers ▼]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Order #12345 | 2 hours ago
+User: @alisher_k (ID: 123456)
+Amount: 15,000 RUB
+Tickets: 10x VIP
+Lottery: BAHODIR BRAT #45
+
+[View Receipt] [Approve] [Reject]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Order #12344 | 5 hours ago
+User: @user123 (ID: 789012)
+Amount: 5,000 RUB
+Tickets: 5x Gold
+Lottery: BAHODIR BRAT #45
+
+[View Receipt] [Approve] [Reject]
+```
+
+### Verification process
+
+<Steps>
+<Step title="Open receipt">
+  Click "View Receipt" to see the uploaded payment proof:
+  
+  <Frame>
+  ```
+  📸 PAYMENT RECEIPT - Order #12345
+  
+  [Receipt Image Display]
+  
+  Order Details:
+  • User: @alisher_k
+  • Amount: 15,000 RUB
+  • Tickets: 10x VIP
+  • Uploaded: 2024-01-20 14:30
+  
+  Expected Payment Details:
+  • Card: 2202 2063 XXXX 1234
+  • Amount: 15,000 RUB
+  • Bank: Sberbank
+  ```
+  </Frame>
+</Step>
+
+<Step title="Verify information">
+  Check the receipt for required information:
+  
+  <AccordionGroup>
+  <Accordion title="✅ Verification checklist">
+    - [ ] Card number matches (last 4 digits)
+    - [ ] Amount is exactly 15,000 RUB
+    - [ ] Transaction date is recent
+    - [ ] Transaction ID is visible
+    - [ ] Receipt is clear and readable
+    - [ ] No signs of tampering
+  </Accordion>
+  
+  <Accordion title="❌ Common issues">
+    - Wrong amount transferred
+    - Unclear or blurry photo
+    - Missing transaction details
+    - Wrong recipient card
+    - Edited or fake receipt
+    - Duplicate transaction
+  </Accordion>
+  </AccordionGroup>
+</Step>
+
+<Step title="Approve or reject">
+  <Tabs>
+  <Tab title="Approve">
+    If verification passes, click "Approve":
+    
+    ```
+    ✅ APPROVE PAYMENT
+    
+    Order #12345 will be approved.
+    
+    Actions that will be performed:
+    • Mark payment as verified
+    • Activate 10 VIP tickets
+    • Send confirmation to user
+    • Add to revenue statistics
+    
+    [Confirm Approval] [Cancel]
+    ```
+    
+    <Check>
+    Payment approved! User notified and tickets activated.
+    </Check>
+  </Tab>
+  
+  <Tab title="Reject">
+    If verification fails, click "Reject" and provide reason:
+    
+    ```
+    ❌ REJECT PAYMENT
+    
+    Order #12345 will be rejected.
+    
+    Rejection reason:
+    [Dropdown: Select reason]
+    • Wrong amount
+    • Unclear receipt
+    • Missing details
+    • Wrong recipient
+    • Suspicious activity
+    • Other (specify)
+    
+    Additional notes:
+    [Text area for detailed explanation]
+    
+    [Confirm Rejection] [Cancel]
+    ```
+    
+    User receives notification with rejection reason and can upload a new receipt.
+  </Tab>
+  </Tabs>
+</Step>
+</Steps>
+
+### Bulk actions
+
+Process multiple payments efficiently:
+
+```
+Select: [✓] Order #12345 | [✓] Order #12346 | [ ] Order #12347
+
+Bulk Actions:
+[Approve Selected (2)] [Reject Selected (2)] [Export List]
+```
+
+<Tip>
+Use bulk approval for verified payments from trusted users to save time.
+</Tip>
+
+## Lottery management
+
+### Create new lottery
+
+<Steps>
+<Step title="Basic information">
+  ```
+  ➕ CREATE NEW LOTTERY DRAW
+  
+  Name: [BAHODIR BRAT #46_____________]
+  
+  Description:
+  [Yangi yil maxsus lotereya! Katta sovg'alar!]
+  
+  YouTube Stream URL:
+  [https://youtube.com/live/xxxxx_____]
+  
+  Schedule:
+  Start Date: [2024-01-27] Time: [20:00]
+  End Date: [2024-01-27] Time: [23:00]
+  ```
+</Step>
+
+<Step title="Ticket pricing">
+  ```
+  💰 TICKET PRICES
+  
+  Standard: [500] RUB
+  Gold: [1000] RUB (2x chance)
+  VIP: [1500] RUB (3x chance)
+  
+  Max tickets per user: [50]
+  ```
+  
+  <Note>
+  Gold and VIP prices are automatically calculated as 2x and 3x standard price.
+  </Note>
+</Step>
+
+<Step title="Prizes">
+  ```
+  🎁 PRIZES
+  
+  Prize 1:
+  Name: [iPhone 15 Pro Max 256GB_____]
+  Description: [Yangi, kafolat bilan______]
+  Value: [150000] RUB
+  
+  Prize 2:
+  Name: [AirPods Pro 2nd Gen________]
+  Description: [Original, kafolat bilan___]
+  Value: [30000] RUB
+  
+  [+ Add Prize]
+  
+  Total Prizes: 2
+  Total Value: 180,000 RUB
+  ```
+</Step>
+
+<Step title="Payment settings">
+  ```
+  💳 PAYMENT CARDS
+  
+  Card 1: Sberbank
+  Number: [2202 2063 1234 5678]
+  Holder: [IVANOV IVAN]
+  [✓] Active
+  
+  Card 2: Tinkoff
+  Number: [5536 9137 8765 4321]
+  Holder: [PETROV PETR]
+  [✓] Active
+  
+  [+ Add Card]
+  ```
+</Step>
+
+<Step title="Create lottery">
+  ```
+  Review and Create:
+  
+  ✓ Basic info complete
+  ✓ Pricing configured
+  ✓ 2 prizes added
+  ✓ Payment cards active
+  
+  [Create Lottery] [Save as Draft]
+  ```
+  
+  <Check>
+  Lottery created successfully! Status: Scheduled
+  </Check>
+</Step>
+</Steps>
+
+### Manage active lotteries
+
+```
+🎬 ACTIVE LOTTERIES
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BAHODIR BRAT #45 | Status: LIVE 🔴
+Start: 2024-01-20 20:00
+Participants: 1,247 tickets
+Revenue: 1,450,000 RUB
+
+[View Details] [Select Winners] [End Draw]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BAHODIR BRAT #46 | Status: Scheduled ⏰
+Start: 2024-01-27 20:00
+Participants: 234 tickets
+Revenue: 285,000 RUB
+
+[View Details] [Edit] [Start Early] [Cancel]
+```
+
+### Start lottery draw
+
+<Steps>
+<Step title="Initiate draw">
+  Click "Start Draw" when ready to begin:
+  
+  ```
+  🎬 START LOTTERY DRAW
+  
+  BAHODIR BRAT #45
+  
+  Current Status:
+  • Total Tickets: 1,247
+  • Participants: 456 users
+  • Revenue: 1,450,000 RUB
+  • Prizes: 3
+  
+  ⚠️ Starting the draw will:
+  • Lock ticket sales
+  • Notify all participants
+  • Enable winner selection
+  
+  [Start Draw] [Cancel]
+  ```
+</Step>
+
+<Step title="Live draw mode">
+  ```
+  🔴 LIVE DRAW - BAHODIR BRAT #45
+  
+  Status: Active
+  Started: 20:05
+  Participants: 1,247 tickets
+  
+  Ticket Distribution:
+  • VIP: 345 tickets (1,035 chances)
+  • Gold: 567 tickets (1,134 chances)
+  • Standard: 335 tickets (335 chances)
+  
+  Total Chances: 2,504
+  
+  [Select Winners] [End Draw]
+  ```
+</Step>
+</Steps>
+
+### Select winners
+
+<Steps>
+<Step title="Automated selection">
+  Click "Select Winners" to use the automated system:
+  
+  ```
+  🎲 SELECT WINNERS
+  
+  Prize 1: iPhone 15 Pro Max
+  [Select Winner]
+  
+  Prize 2: AirPods Pro
+  [Select Winner]
+  
+  Prize 3: 50,000 RUB
+  [Select Winner]
+  
+  Selection Method:
+  (•) Weighted Random (VIP 3x, Gold 2x, Standard 1x)
+  ( ) Pure Random (All tickets equal chance)
+  ( ) Manual Selection
+  
+  [Select All Winners] [Cancel]
+  ```
+</Step>
+
+<Step title="Winner announcement">
+  ```
+  🎉 WINNERS SELECTED!
+  
+  Prize 1: iPhone 15 Pro Max
+  Winner: @alisher_k
+  Ticket: VIP-12347
+  
+  Prize 2: AirPods Pro
+  Winner: @user123
+  Ticket: GOLD-45678
+  
+  Prize 3: 50,000 RUB
+  Winner: @winner3
+  Ticket: STD-78901
+  
+  Actions:
+  [✓] Notify Winners
+  [✓] Post to Channel
+  [✓] Update Statistics
+  
+  [Confirm & Announce] [Reselect]
+  ```
+  
+  <Check>
+  Winners announced! Notifications sent to all participants.
+  </Check>
+</Step>
+
+<Step title="Prize delivery">
+  Track prize delivery status:
+  
+  ```
+  📦 PRIZE DELIVERY TRACKING
+  
+  Winner: @alisher_k
+  Prize: iPhone 15 Pro Max
+  
+  Contact Info:
+  Phone: +7 999 123 4567
+  Address: Moscow, Lenina 123, apt 45
+  
+  Delivery Status: Pending
+  [Mark as Contacted]
+  [Mark as Shipped]
+  [Mark as Delivered]
+  
+  Notes:
+  [Add delivery notes...]
+  ```
+</Step>
+</Steps>
+
+## User management
+
+### User list
+
+```
+👥 USER MANAGEMENT (12,547 users)
+
+Search: [____________] Filter: [All Users ▼] Sort: [Newest ▼]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@alisher_k | ID: 123456
+Name: Alisher Karimov
+Joined: 2024-01-10
+Orders: 15 | Spent: 125,000 RUB | Wins: 2
+Status: Active | Role: User
+
+[View Profile] [Edit] [Ban] [Make Premium]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@user123 | ID: 789012
+Name: Ivan Petrov
+Joined: 2024-01-15
+Orders: 5 | Spent: 25,000 RUB | Wins: 0
+Status: Active | Role: User
+
+[View Profile] [Edit] [Ban] [Make Premium]
+```
+
+### User profile details
+
+```
+👤 USER PROFILE - @alisher_k
+
+Personal Information:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Telegram ID: 123456789
+Username: @alisher_k
+Name: Alisher Karimov
+Phone: +7 999 123 4567
+Joined: 2024-01-10
+Last Active: 2 hours ago
+
+Account Status:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Role: User
+Status: Active
+Premium: Yes (until 2024-12-31)
+Balance: 0 RUB
+
+Statistics:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total Orders: 15
+Approved: 12
+Rejected: 2
+Pending: 1
+
+Total Spent: 125,000 RUB
+Total Tickets: 87
+Wins: 2
+
+Recent Orders:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#12345 | 2024-01-20 | 15,000 RUB | 10x VIP | Approved
+#12234 | 2024-01-18 | 10,000 RUB | 10x Gold | Approved
+#12123 | 2024-01-15 | 5,000 RUB | 10x Std | Rejected
+
+Actions:
+[Edit User] [Ban User] [Send Message] [View All Orders]
+```
+
+### User actions
+
+<Tabs>
+<Tab title="Edit user">
+  ```
+  ✏️ EDIT USER - @alisher_k
+  
+  Role:
+  ( ) User
+  (•) Premium User
+  ( ) Admin
+  ( ) Super Admin
+  
+  Status:
+  (•) Active
+  ( ) Banned
+  ( ) Suspended
+  
+  Premium Until:
+  [2024-12-31]
+  
+  Balance:
+  [0] RUB
+  
+  Notes:
+  [Trusted user, fast payments]
+  
+  [Save Changes] [Cancel]
+  ```
+</Tab>
+
+<Tab title="Ban user">
+  ```
+  🚫 BAN USER - @alisher_k
+  
+  Reason:
+  ( ) Fraud/Fake receipts
+  ( ) Multiple accounts
+  ( ) Abusive behavior
+  ( ) Payment issues
+  (•) Other
+  
+  Details:
+  [Specify ban reason...]
+  
+  Duration:
+  ( ) Permanent
+  (•) Temporary: [7] days
+  
+  [Confirm Ban] [Cancel]
+  ```
+</Tab>
+
+<Tab title="Send message">
+  ```
+  💬 SEND MESSAGE - @alisher_k
+  
+  Message:
+  [Type your message here...]
+  
+  Template:
+  [Select template ▼]
+  • Payment reminder
+  • Prize delivery info
+  • Account warning
+  • Custom message
+  
+  [Send Message] [Cancel]
+  ```
+</Tab>
+</Tabs>
+
+## Prize management
+
+```
+🎁 PRIZE INVENTORY
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+iPhone 15 Pro Max 256GB
+Value: 150,000 RUB
+Stock: 3 units
+Status: Available
+
+[Edit] [Add Stock] [Remove]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+AirPods Pro 2nd Gen
+Value: 30,000 RUB
+Stock: 5 units
+Status: Available
+
+[Edit] [Add Stock] [Remove]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Cash Prize
+Value: Variable
+Stock: Unlimited
+Status: Available
+
+[Edit]
+
+[+ Add New Prize]
+```
+
+## Analytics and reports
+
+### Revenue reports
+
+<Tabs>
+<Tab title="Daily report">
+  ```
+  📊 DAILY REVENUE REPORT - 2024-01-20
+  
+  Total Revenue: 245,000 RUB
+  
+  By Ticket Tier:
+  • VIP: 135,000 RUB (55%)
+  • Gold: 80,000 RUB (33%)
+  • Standard: 30,000 RUB (12%)
+  
+  By Payment Method:
+  • Sberbank: 150,000 RUB (61%)
+  • Tinkoff: 70,000 RUB (29%)
+  • VTB: 25,000 RUB (10%)
+  
+  Orders:
+  • Total: 67
+  • Approved: 54
+  • Pending: 12
+  • Rejected: 1
+  
+  [Export PDF] [Export Excel]
+  ```
+</Tab>
+
+<Tab title="Monthly report">
+  ```
+  📊 MONTHLY REVENUE REPORT - January 2024
+  
+  Total Revenue: 5,230,000 RUB
+  Average Daily: 168,710 RUB
+  
+  Growth: +23% vs December
+  
+  Top Performing Days:
+  1. Jan 20: 245,000 RUB
+  2. Jan 13: 230,000 RUB
+  3. Jan 6: 215,000 RUB
+  
+  User Metrics:
+  • New Users: 2,345
+  • Active Users: 8,901
+  • Retention Rate: 67%
+  
+  [Export PDF] [Export Excel]
+  ```
+</Tab>
+
+<Tab title="Custom report">
+  ```
+  📊 CUSTOM REPORT
+  
+  Date Range:
+  From: [2024-01-01] To: [2024-01-31]
+  
+  Include:
+  [✓] Revenue breakdown
+  [✓] User statistics
+  [✓] Ticket sales
+  [✓] Payment methods
+  [✓] Lottery performance
+  [ ] Individual transactions
+  
+  Group By:
+  (•) Day
+  ( ) Week
+  ( ) Month
+  
+  [Generate Report]
+  ```
+</Tab>
+</Tabs>
+
+### User analytics
+
+```
+👥 USER ANALYTICS
+
+Total Users: 12,547
+New This Month: 2,345 (+23%)
+Active Users: 8,901 (71%)
+
+User Segments:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• High Value (10+ orders): 1,234 users (10%)
+• Regular (3-9 orders): 3,456 users (28%)
+• Occasional (1-2 orders): 5,678 users (45%)
+• Inactive (0 orders): 2,179 users (17%)
+
+Premium Members: 1,234 (10%)
+Banned Users: 23 (0.2%)
+
+Top Spenders:
+1. @user1: 450,000 RUB
+2. @user2: 380,000 RUB
+3. @user3: 320,000 RUB
+```
+
+## Settings
+
+### System settings
+
+<AccordionGroup>
+<Accordion title="General settings">
+  ```
+  ⚙️ GENERAL SETTINGS
+  
+  System Name: [Bahodir Brat Lottery]
+  Support Username: [@BahodirLotterySupport]
+  Admin Username: [@BahodirAdmin]
+  
+  Maintenance Mode:
+  [ ] Enable maintenance mode
+  
+  Auto-approve trusted users:
+  [✓] Enable (users with 10+ approved orders)
+  
+  [Save Settings]
+  ```
+</Accordion>
+
+<Accordion title="Payment settings">
+  ```
+  💳 PAYMENT SETTINGS
+  
+  Receipt Requirements:
+  Max File Size: [5] MB
+  Allowed Formats: [✓] JPG [✓] PNG
+  
+  Verification:
+  Auto-reject after: [48] hours
+  Reminder after: [12] hours
+  
+  Supported Banks:
+  [✓] Sberbank
+  [✓] Tinkoff
+  [✓] VTB
+  [✓] Alfa-Bank
+  
+  [Save Settings]
+  ```
+</Accordion>
+
+<Accordion title="Notification settings">
+  ```
+  🔔 NOTIFICATION SETTINGS
+  
+  User Notifications:
+  [✓] Payment approved
+  [✓] Payment rejected
+  [✓] Lottery started
+  [✓] Winner announcement
+  
+  Admin Notifications:
+  [✓] New payment receipt
+  [✓] New user registration
+  [✓] System errors
+  
+  [Save Settings]
+  ```
+</Accordion>
+
+<Accordion title="Security settings">
+  ```
+  🔐 SECURITY SETTINGS
+  
+  Two-Factor Authentication:
+  [✓] Required for all admins
+  
+  Session Timeout: [30] minutes
+  
+  Password Policy:
+  Min Length: [12] characters
+  [✓] Require uppercase
+  [✓] Require numbers
+  [✓] Require special characters
+  
+  IP Whitelist:
+  [Add IP addresses...]
+  
+  [Save Settings]
+  ```
+</Accordion>
+</AccordionGroup>
+
+## Audit log
+
+Track all admin actions:
+
+```
+📋 AUDIT LOG
+
+Filter: [All Actions ▼] User: [All Admins ▼] Date: [Last 7 days ▼]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2024-01-20 20:15:34 | @admin1
+Action: Approved payment
+Details: Order #12345, Amount: 15,000 RUB
+IP: 192.168.1.100
+
+2024-01-20 20:10:22 | @admin1
+Action: Selected winners
+Details: Lottery #45, 3 winners
+IP: 192.168.1.100
+
+2024-01-20 19:45:18 | @admin2
+Action: Created lottery
+Details: BAHODIR BRAT #46
+IP: 192.168.1.101
+
+2024-01-20 18:30:45 | @admin1
+Action: Banned user
+Details: @spammer123, Reason: Fraud
+IP: 192.168.1.100
+
+[Export Log] [Clear Old Logs]
+```
+
+<Note>
+All admin actions are logged and cannot be deleted. Logs are retained for 1 year for security and compliance.
+</Note>
+
+## Admin roles and permissions
+
+<Tabs>
+<Tab title="Super admin">
+  **Full system access:**
+  - All admin functions
+  - User management
+  - System settings
+  - Create/delete admins
+  - Access audit logs
+  - Financial reports
+</Tab>
+
+<Tab title="Admin">
+  **Standard admin access:**
+  - Payment verification
+  - Lottery management
+  - User support
+  - View statistics
+  - Prize management
+  - Limited settings
+</Tab>
+
+<Tab title="Moderator">
+  **Limited access:**
+  - Payment verification only
+  - View user profiles
+  - Basic statistics
+  - No system changes
+</Tab>
+</Tabs>
+
+<Warning>
+Only Super Admins can create new admin accounts and modify system settings. Protect Super Admin credentials carefully.
+</Warning>
