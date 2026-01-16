@@ -103,14 +103,14 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "YouTube Channel",
+          "href": "https://youtube.com/@bahodirbrat",
+          "icon": "youtube"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Telegram Bot",
+          "href": "https://t.me/BahodirLotteryBot",
+          "icon": "paper-plane"
         }
       ]
     }
