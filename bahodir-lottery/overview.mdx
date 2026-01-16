@@ -1,0 +1,211 @@
+---
+title: "Bahodir Brat Lottery Bot"
+description: "Professional Telegram lottery system for YouTube live streams with automated ticket sales and winner selection"
+---
+
+## Project overview
+
+Bahodir Brat Lottery Bot is a professional-grade Telegram Web App designed for conducting live lottery draws during YouTube streams. The system handles ticket sales, payment verification, and automated winner selection for the "BAHODIR BRAT" YouTube channel.
+
+<CardGroup cols={2}>
+<Card title="User features" icon="user" href="/bahodir-lottery/user-features">
+  Ticket purchasing, payment tracking, and live stream integration
+</Card>
+
+<Card title="Admin dashboard" icon="shield" href="/bahodir-lottery/admin-features">
+  Payment verification, lottery management, and analytics
+</Card>
+
+<Card title="Payment system" icon="credit-card" href="/bahodir-lottery/payment-system">
+  Russian bank card integration with manual verification
+</Card>
+
+<Card title="Security" icon="lock" href="/bahodir-lottery/security">
+  JWT authentication, role-based access, and audit logging
+</Card>
+</CardGroup>
+
+## Key features
+
+<AccordionGroup>
+<Accordion title="Automated lottery system">
+  - Real-time ticket sales during live streams
+  - Three ticket tiers: Standard, Gold, and VIP
+  - Automated winner selection algorithm
+  - Live notification system for winners
+</Accordion>
+
+<Accordion title="Payment processing">
+  - Support for major Russian banks (Sberbank, Tinkoff, VTB, Alfa-Bank)
+  - Manual payment verification with receipt upload
+  - Real-time order tracking
+  - Automated payment status notifications
+</Accordion>
+
+<Accordion title="Admin control panel">
+  - Real-time dashboard with revenue and user statistics
+  - Payment receipt verification interface
+  - Lottery control (start/stop, winner selection)
+  - User and prize management
+  - Comprehensive analytics and reporting
+</Accordion>
+
+<Accordion title="YouTube integration">
+  - Live stream status synchronization
+  - Automated lottery activation during streams
+  - Real-time viewer engagement
+  - Winner announcements during broadcasts
+</Accordion>
+</AccordionGroup>
+
+## Technical stack
+
+<Tabs>
+<Tab title="Backend">
+  - **Language**: Python 3.11+
+  - **Framework**: FastAPI
+  - **Database**: PostgreSQL 15+
+  - **Cache**: Redis
+  - **Task Queue**: Celery
+  - **Authentication**: JWT tokens
+</Tab>
+
+<Tab title="Frontend">
+  - **Framework**: Telegram Web App API
+  - **Languages**: HTML5, CSS3, JavaScript (ES6+)
+  - **UI Library**: Telegram UI Kit
+  - **State Management**: LocalStorage + API sync
+</Tab>
+
+<Tab title="Infrastructure">
+  - **Architecture**: Microservices
+  - **API**: RESTful + WebSocket
+  - **Deployment**: Docker + Docker Compose
+  - **Monitoring**: Prometheus + Grafana
+  - **Logging**: ELK Stack
+</Tab>
+</Tabs>
+
+## Architecture overview
+
+```mermaid
+graph TB
+    A[Telegram Bot] --> B[API Gateway]
+    B --> C[Auth Service]
+    B --> D[Payment Service]
+    B --> E[Lottery Service]
+    B --> F[Notification Service]
+    
+    C --> G[(PostgreSQL)]
+    D --> G
+    E --> G
+    
+    D --> H[(Redis Cache)]
+    E --> H
+    
+    F --> I[Telegram API]
+    E --> J[YouTube API]
+    
+    K[Admin Panel] --> B
+    L[User Web App] --> B
+```
+
+## Quick start
+
+<Steps>
+<Step title="Clone repository">
+  ```bash
+  git clone https://github.com/bahodir-brat/lottery-bot.git
+  cd lottery-bot
+  ```
+</Step>
+
+<Step title="Configure environment">
+  Create `.env` file with required credentials:
+  
+  ```bash
+  # Telegram
+  TELEGRAM_BOT_TOKEN=your_bot_token
+  TELEGRAM_API_ID=your_api_id
+  TELEGRAM_API_HASH=your_api_hash
+  
+  # Database
+  DATABASE_URL=postgresql://user:password@localhost:5432/lottery_db
+  REDIS_URL=redis://localhost:6379/0
+  
+  # JWT
+  JWT_SECRET_KEY=your_secret_key
+  JWT_ALGORITHM=HS256
+  
+  # YouTube
+  YOUTUBE_API_KEY=your_youtube_api_key
+  YOUTUBE_CHANNEL_ID=your_channel_id
+  ```
+  
+  <Warning>
+  Never commit `.env` file to version control. Add it to `.gitignore`.
+  </Warning>
+</Step>
+
+<Step title="Start services">
+  ```bash
+  docker-compose up -d
+  ```
+  
+  <Check>
+  Verify all services are running: `docker-compose ps`
+  </Check>
+</Step>
+
+<Step title="Run migrations">
+  ```bash
+  docker-compose exec api alembic upgrade head
+  ```
+</Step>
+
+<Step title="Create admin user">
+  ```bash
+  docker-compose exec api python scripts/create_admin.py
+  ```
+</Step>
+</Steps>
+
+## System requirements
+
+<CardGroup cols={2}>
+<Card title="Development" icon="laptop-code">
+  - Python 3.11+
+  - PostgreSQL 15+
+  - Redis 7+
+  - Docker 24+
+  - 4GB RAM minimum
+</Card>
+
+<Card title="Production" icon="server">
+  - 2 CPU cores minimum
+  - 8GB RAM minimum
+  - 50GB SSD storage
+  - Ubuntu 22.04 LTS
+  - SSL certificate
+</Card>
+</CardGroup>
+
+## Support and documentation
+
+<CardGroup cols={3}>
+<Card title="User guide" icon="book" href="/bahodir-lottery/user-features">
+  Complete guide for lottery participants
+</Card>
+
+<Card title="Admin guide" icon="user-shield" href="/bahodir-lottery/admin-features">
+  Dashboard and management documentation
+</Card>
+
+<Card title="API reference" icon="code" href="/bahodir-lottery/api-reference">
+  Complete API endpoint documentation
+</Card>
+</CardGroup>
+
+<Note>
+This documentation is for version 1.0.0 of the Bahodir Brat Lottery Bot. For updates and changelog, visit the [GitHub repository](https://github.com/bahodir-brat/lottery-bot).
+</Note>
